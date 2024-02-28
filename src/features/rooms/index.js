@@ -1,19 +1,22 @@
 import moment from "moment";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import TitleCard from "../../components/Cards/TitleCard";
 import { openModal } from "../common/modalSlice";
-import { deleteRoom, getRoomContent } from "./roomSlice";
 import {
   CONFIRMATION_MODAL_CLOSE_TYPES,
   MODAL_BODY_TYPES,
 } from "../../utils/globalConstantUtil";
 import TrashIcon from "@heroicons/react/24/outline/TrashIcon";
+import PencilSquareIcon from "@heroicons/react/24/outline/PencilSquareIcon";
 import { showNotification } from "../common/headerSlice";
 import SearchBar from "../../components/Input/SearchBar";
+import { getRooms } from "../../app/reducers/app";
 
 const TopSideButtons = () => {
   const dispatch = useDispatch();
+
+  const [loading, setLoading] = useState(false)
 
   const openAddNewRoomModal = () => {
     dispatch(
@@ -23,6 +26,8 @@ const TopSideButtons = () => {
       })
     );
   };
+
+
 
   return (
     <div className="">
@@ -40,12 +45,44 @@ const TopSideButtons = () => {
 
 function Rooms() {
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false)
+  const [rooms, setRooms] = useState([])
+
+  const handlerGetRooms = async () => {
+    try {
+      setLoading(true)
+      await dispatch(getRooms()).then((res) => {
+        if (res.meta.requestStatus === "rejected") {
+          showNotification({ message: res.payload, status: 0 })
+          setLoading(false)
+          return
+        }
+        setRooms(res.payload)
+        setLoading(false)
+      }).catch((err) => {
+        console.error(err)
+        setLoading(false)
+      })
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   useEffect(() => {
-    dispatch(getRoomContent());
-  }, []);
+    handlerGetRooms()
+  }, [])
 
-  const dbData = false;
+  const updateCurrentRoom = (item) => {
+    dispatch(
+      openModal({
+        title: "Update Room",
+        bodyType: MODAL_BODY_TYPES.UPDATE_ROOM,
+        extraObject: {
+          item,
+        },
+      })
+    );
+  };
 
   const deleteCurrentRoom = (index) => {
     dispatch(
@@ -64,7 +101,7 @@ function Rooms() {
   return (
     <>
       <TitleCard
-        title="Current room"
+        title="Rooms"
         topMargin="mt-2"
         TopSideButtons={<TopSideButtons />}
       >
@@ -73,8 +110,8 @@ function Rooms() {
           <table className="table w-full">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Amount</th>
+                <th>Title</th>
+                <th>Price</th>
                 <th>size</th>
                 <th>Capacity</th>
                 <th>Bed</th>
@@ -83,43 +120,56 @@ function Rooms() {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>
-                  <div className="flex items-center space-x-3">
-                    <div className="avatar">
-                      <div className="mask mask-circle w-12 h-12">
-                        <img
-                          src="https://reqres.in/img/faces/1-image.jpg"
-                          alt="Avatar"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <div className="font-bold">martin</div>
-                    </div>
-                  </div>
-                </td>
-                <td>100</td>
-                <td>10</td>
-                <td>10 people</td>
-                <td>5 bed</td>
-                <td>TV ,mini Fride</td>
-                <td>
-                  <button
-                    className="btn btn-square btn-ghost"
-                    onClick={() => deleteCurrentRoom(1)}
-                  >
-                    <TrashIcon className="w-5" />
-                  </button>
-                </td>
-              </tr>
-              {dbData === false && (
-                <tr>
+              {rooms.length > 0 ?
+                rooms.map((item, index) => {
+                  console.log(`http://localhost:5005/uploads/gallery/${item?.images[0]}`)
+                  return (
+                    <tr key={index}>
+                      <td>
+                        <div className="flex items-center space-x-3">
+                          <div className="avatar">
+                            <div className="mask mask-circle w-12 h-12">
+                              <img
+                                src={`http://localhost:5005/uploads/gallery/${item?.images[0]}`}
+                                alt="Image"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <div className="font-bold">{item.title}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>{item.price}</td>
+                      <td>{item.size}</td>
+                      <td>{item.capacity}</td>
+                      <td>{item.bed} bed</td>
+                      <td style={{ maxWidth: 220, display: 'flex', flexWrap: 'wrap' }}>
+                        {item?.services[0].split(",").map((item) => (
+                          <span style={{ marginRight: 10 }}>{item},</span>
+                        ))}
+                      </td>
+                      <td>
+                        <button
+                          className="btn btn-square btn-ghost"
+                          onClick={() => updateCurrentRoom(item)}
+                        >
+                          <PencilSquareIcon className="w-5" />
+                        </button>
+                        <button
+                          className="btn btn-square btn-ghost"
+                          onClick={() => deleteCurrentRoom(1)}
+                        >
+                          <TrashIcon className="w-5" />
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                }) : <tr>
                   <td colSpan="6" className="text-center py-4">
                     No records found
                   </td>
-                </tr>
-              )}
+                </tr>}
             </tbody>
           </table>
         </div>

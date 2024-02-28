@@ -16,7 +16,7 @@ const INITIAL_ROOM_OBJ = {
   desc: "",
 };
 
-function AddRoomModalBody({ closeModal }) {
+function UpdateRoomModalBody({ closeModal, extraObject }) {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -24,6 +24,9 @@ function AddRoomModalBody({ closeModal }) {
   const [services, setServices] = useState([])
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [roomObj, setroomObj] = useState(INITIAL_ROOM_OBJ);
+
+  const { item } = extraObject
+  console.log(item)
 
   const saveNewRoom = async () => {
     if (roomObj.name.trim() === "") return setErrorMessage("Title is required!");
@@ -187,4 +190,4 @@ function AddRoomModalBody({ closeModal }) {
   );
 }
 
-export default AddRoomModalBody;
+export default UpdateRoomModalBody;

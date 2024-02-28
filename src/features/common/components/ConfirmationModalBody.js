@@ -4,7 +4,6 @@ import {
   CONFIRMATION_MODAL_CLOSE_TYPES,
   MODAL_CLOSE_TYPES,
 } from "../../../utils/globalConstantUtil";
-import { deleteRoom } from "../../rooms/roomSlice";
 import { showNotification } from "../headerSlice";
 import { deleteTestimony } from "../../Testimony/testimonySlice";
 import { deleteGallery } from "../../Gallery/gallerySlice";
@@ -18,7 +17,7 @@ function ConfirmationModalBody({ extraObject, closeModal }) {
   const proceedWithYes = async () => {
     if (type === CONFIRMATION_MODAL_CLOSE_TYPES.ROOM_DELETE) {
       // positive response, call api or dispatch redux function
-      dispatch(deleteRoom({ index }));
+      // dispatch(deleteRoom({ index }));
       dispatch(showNotification({ message: "Room Deleted!", status: 1 }));
     }
     else if (type === CONFIRMATION_MODAL_CLOSE_TYPES.TESTIMONY_DELETE) {

@@ -1,15 +1,13 @@
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import TitleCard from "../../components/Cards/TitleCard";
 import { openModal } from "../common/modalSlice";
 import { getTestimonyContent } from "./testimonySlice";
-import { RECENT_TRANSACTIONS } from "../../utils/dummyData";
 import {
   CONFIRMATION_MODAL_CLOSE_TYPES,
   MODAL_BODY_TYPES,
 } from "../../utils/globalConstantUtil";
 import TrashIcon from "@heroicons/react/24/outline/TrashIcon";
-import { showNotification } from "../common/headerSlice";
 import SearchBar from "../../components/Input/SearchBar";
 
 const TopSideButtons = () => {

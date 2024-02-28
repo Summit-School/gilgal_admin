@@ -5,6 +5,8 @@ import ConfirmationModalBody from "../features/common/components/ConfirmationMod
 import AddTestimonyModalBody from "../features/Testimony/AddTestimonyModalBody";
 import AddGalleryModalBody from "../features/Gallery/AddGalleryModalBody";
 import AddRoomModalBody from "../features/rooms/AddRoomModalBody";
+import UpdateRoomModalBody from "../features/rooms/UpdateRoomModalBody";
+
 import AddEventModalBody from "../features/Events/AddEventModalBody";
 import AddPartnerModalBody from "../features/Partners/AddPartnerModalBody";
 import AddNewsModalBody from "../features/News/AddNewsModalBody";
@@ -12,6 +14,7 @@ import AddTeamModalBody from "../features/Team/AddTeamModalBody";
 import AddProgramModalBody from "../features/Programs/AddProgramModalBody";
 import AddHostCenterModalBody from "../features/HostCenters/AddHostCenterModalBody";
 import AddCourseModalBody from "../features/Courses/AddCourseModalBody";
+
 
 function ModalLayout() {
   const { isOpen, bodyType, size, extraObject, title } = useSelector(
@@ -47,57 +50,64 @@ function ModalLayout() {
                   extraObject={extraObject}
                 />
               ),
+              [MODAL_BODY_TYPES.UPDATE_ROOM]: (
+                <UpdateRoomModalBody
+                  closeModal={close}
+                  extraObject={extraObject}
+                />
+              ),
+
               [MODAL_BODY_TYPES.ADD_NEW_TESTIMONY]: (
                 <AddTestimonyModalBody
-                   closeModal={close}
+                  closeModal={close}
                   extraObject={extraObject}
                 />
               ),
               [MODAL_BODY_TYPES.ADD_NEW_GALLERY]: (
                 <AddGalleryModalBody
-                   closeModal={close}
+                  closeModal={close}
                   extraObject={extraObject}
                 />
               ),
               [MODAL_BODY_TYPES.ADD_NEW_EVENT]: (
                 <AddEventModalBody
-                   closeModal={close}
+                  closeModal={close}
                   extraObject={extraObject}
                 />
               ),
               [MODAL_BODY_TYPES.ADD_NEW_PARTNER]: (
                 <AddPartnerModalBody
-                   closeModal={close}
+                  closeModal={close}
                   extraObject={extraObject}
                 />
               ),
               [MODAL_BODY_TYPES.ADD_NEW_NEWS]: (
                 <AddNewsModalBody
-                   closeModal={close}
+                  closeModal={close}
                   extraObject={extraObject}
                 />
               ),
               [MODAL_BODY_TYPES.ADD_NEW_HOSTCENTER]: (
                 <AddHostCenterModalBody
-                   closeModal={close}
+                  closeModal={close}
                   extraObject={extraObject}
                 />
               ),
               [MODAL_BODY_TYPES.ADD_NEW_TEAM]: (
                 <AddTeamModalBody
-                   closeModal={close}
+                  closeModal={close}
                   extraObject={extraObject}
                 />
               ),
               [MODAL_BODY_TYPES.ADD_NEW_PROGRAMS]: (
                 <AddProgramModalBody
-                   closeModal={close}
+                  closeModal={close}
                   extraObject={extraObject}
                 />
               ),
               [MODAL_BODY_TYPES.ADD_NEW_COURSE]: (
                 <AddCourseModalBody
-                   closeModal={close}
+                  closeModal={close}
                   extraObject={extraObject}
                 />
               ),
