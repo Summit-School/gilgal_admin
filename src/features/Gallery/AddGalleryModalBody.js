@@ -1,86 +1,132 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import InputText from "../../components/Input/InputText";
-import SelectBox from "../../components/Input/SelectBox";
 import ErrorText from "../../components/Typography/ErrorText";
 import { showNotification } from "../common/headerSlice";
-import { addNewGallery } from "./gallerySlice";
-import ImageUploader from "../../components/Input/ImageUploader";
-
-const INITIAL_GALLERY_OBJ = {
-  url: "",
-  category: "",
-};
+import { addImages, getCategories } from "../../app/reducers/app"
 
 function AddGalleryModalBody({ closeModal }) {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [galleryObj, setgalleryObj] = useState(INITIAL_GALLERY_OBJ);
+  const [category, setCategory] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [previews, setPreviews] = useState([])
+  const [categories, setCategories] = useState([])
 
-  const saveNewGallery = () => {
-    if (galleryObj.url.trim() === "") return setErrorMessage("img is required!");
-    else if (galleryObj.category.trim() === "")
+  const saveNewGallery = async () => {
+    if (category.trim() === "")
       return setErrorMessage("category id is required!");
     else {
-      let newgalleryObj = {
-        id: 7,
-        url: galleryObj.url,
-        category: galleryObj.category,
-      };
-      dispatch(addNewGallery({ newgalleryObj }));
-      dispatch(showNotification({ message: "Gallery image Added!", status: 1 }));
-      closeModal();
+      setLoading(true)
+      const formData = new FormData();
+      formData.append('category', category);
+      selectedFiles.forEach((file, index) => {
+        formData.append(`file${index + 1}`, file);
+      });
+      await dispatch(addImages(formData)).then((res) => {
+        if (res.meta.requestStatus === "rejected") {
+          setErrorMessage(res.payload)
+          setLoading(false)
+          return
+        }
+        dispatch(showNotification({ message: "Success!", status: 1 }));
+        setLoading(false)
+        closeModal();
+      }).catch((err) => {
+        console.error(err)
+        setLoading(false)
+      })
     }
   };
 
-  const updateFormValue = ({ updateType, value }) => {
-    setErrorMessage("");
-    setgalleryObj({ ...galleryObj, [updateType]: value });
+  const handlerGetCategories = async () => {
+    try {
+      setLoading(true)
+      await dispatch(getCategories()).then((res) => {
+        if (res.meta.requestStatus === "rejected") {
+          showNotification({ message: res.payload, status: 0 })
+          setLoading(false)
+          return
+        }
+        setCategories(res.payload)
+        setLoading(false)
+      }).catch((err) => {
+        console.error(err)
+        setLoading(false)
+      })
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  useEffect(() => {
+    handlerGetCategories()
+  }, [])
+
+  const handleFileChange = (event) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const newSelectedFiles = [...selectedFiles, ...files];
+      setSelectedFiles(newSelectedFiles);
+      displayImagePreviews(newSelectedFiles);
+    }
   };
 
-  const options = [
-    { value: "ConferenceHall", name: "Conference Hall" },
-    { value: "OutDoorDinning", name: "OutDoor Dinning" },
-    { value: "GuestApartment", name: "Guest Apartment" },
-    { value: "OfficeRental", name: "Office Rental" },
-    { value: "BeautySalon", name: "Beauty Salon" },
-    { value: "BillBoardAdverting", name: "BillBoard Adverting" },
-    { value: "Gym", name: "Gym" },
-    { value: "Parking", name: "Parking" },
-    { value: "Chapel", name: "Chapel" },
-    { value: "Canteen", name: "Canteen" },
-    { value: "EricaBallRoom", name: "Erica BallRoom" },
-    { value: "FurnishedOffice", name: "Furnished Office" },
-    { value: "TwoBedRoom2Bath", name: "TwoBedRoom 2Bath" },
-    { value: "PhotoGallery", name: "Photo Gallery" },
-    // Add more options as needed
-  ];
-  const [selectedOptions, setSelectedOptions] = useState([]);
-  const handleImageUpload = (value) => {
-    console.log(value);
-    // handle the uploaded image here
+  const displayImagePreviews = (files) => {
+    const urls = [];
+    for (let i = 0; i < files.length; i++) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        urls.push(reader.result);
+        if (urls.length === files.length) {
+          setPreviews(urls);
+        }
+      };
+      reader.readAsDataURL(files[i]);
+    }
+  };
+
+  const removeImage = (index) => {
+    const newSelectedFiles = [...selectedFiles];
+    newSelectedFiles.splice(index, 1);
+    setSelectedFiles(newSelectedFiles);
+
+    const newImagePreviewUrls = [...previews];
+    newImagePreviewUrls.splice(index, 1);
+    setPreviews(newImagePreviewUrls);
   };
 
   return (
     <>
-      <ImageUploader
-        labelTitle="Upload an image"
-        containerStyle="my-4"
-        defaultValue=""
-        updateFormValue={handleImageUpload}
-        updateType="image"
-      />
-      <SelectBox
-        labelTitle="Select options"
-        defaultValue={selectedOptions}
-        options={options}
-        containerStyle="my-4 w-full"
-        placeholder="Select options"
-        labelStyle="text-lg"
-        updateType="options"
-        updateFormValue={updateFormValue}
-      />
+
+      <select className="input  input-bordered w-full mt-2"
+        onChange={(e) => setCategory(e.target.value)}>
+        <option>Select Category</option>
+        {categories?.map((item, index) => {
+          return (
+            <option key={index} value={item?.title}>{item?.title}</option>
+          )
+        })}
+      </select>
+
+      <p style={{ marginTop: 20 }}>Image</p>
+      <input
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={handleFileChange} className="input  input-bordered w-full mt-2" />
+
+      <ul style={{ display: 'flex', flexWrap: 'wrap', marginTop: 20 }}>
+        {previews?.map((url, index) => (
+          <div style={{ width: "32%", margin: 2 }}>
+            <img key={index} src={url} alt={`Image Preview ${index + 1}`}
+              style={{ width: "100%", height: '80%', display: 'flex', border: '1px solid #ccc', cursor: 'pointer' }} />
+            <p style={{ textAlign: 'right', cursor: 'pointer', color: 'red' }}
+              onClick={() => removeImage(index)}
+            >remove</p>
+          </div>
+        ))}
+      </ul>
 
       <ErrorText styleClass="mt-16">{errorMessage}</ErrorText>
       <div className="modal-action">
@@ -91,7 +137,7 @@ function AddGalleryModalBody({ closeModal }) {
           className="btn btn-primary px-6"
           onClick={() => saveNewGallery()}
         >
-          Save
+          {loading ? "Loading..." : "Save"}
         </button>
       </div>
     </>

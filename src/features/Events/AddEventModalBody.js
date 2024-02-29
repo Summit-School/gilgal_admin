@@ -2,19 +2,15 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import InputText from "../../components/Input/InputText";
 import TextAreaInput from "../../components/Input/TextAreaInput";
-import SelectBox from "../../components/Input/SelectBox";
 import ErrorText from "../../components/Typography/ErrorText";
 import { showNotification } from "../common/headerSlice";
-import { addNewEvents, deleteEvents } from "./eventSlice";
-import ImageUploader from "../../components/Input/ImageUploader";
+import { addEvent } from "../../app/reducers/app";
 
 const INITIAL_EVENT_OBJ = {
   name: "",
   category: "",
-  date: "",
   image: "",
   description: "",
-  location: "",
 };
 
 function AddEventModalBody({ closeModal }) {
@@ -22,33 +18,36 @@ function AddEventModalBody({ closeModal }) {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [eventObj, seteventObj] = useState(INITIAL_EVENT_OBJ);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [previews, setPreviews] = useState([])
 
-  const saveNewEvent = () => {
+  const saveNewEvent = async () => {
     if (eventObj.name.trim() === "")
       return setErrorMessage("Event name is required!");
     else if (eventObj.category.trim() === "")
-      return setErrorMessage("Event category is required!");
-    else if (eventObj.date.trim() === "")
-      return setErrorMessage("Event date is required!");
+      return setErrorMessage("Event category is required!")
     else if (eventObj.description.trim() === "")
       return setErrorMessage("Event description is required!");
-    else if (eventObj.location.trim() === "")
-      return setErrorMessage("Event location is required!");
     else {
-      let neweventObj = {
-        id: 7,
-        name: eventObj.name,
-        category: eventObj.category,
-        date: eventObj.date,
-        image: eventObj.image,
-        description: eventObj.description,
-        location: eventObj.location,
-      };
-      dispatch(addNewEvents({ neweventObj }));
-      dispatch(
-        showNotification({ message: "Event succesfully Added!", status: 1 })
-      );
-      closeModal();
+      setLoading(true)
+      const formData = new FormData();
+      formData.append('image', selectedFiles[0]);
+      formData.append('title', eventObj.name);
+      formData.append('category', eventObj.category);
+      formData.append('details', eventObj.description);
+      await dispatch(addEvent(formData)).then((res) => {
+        if (res.meta.requestStatus === "rejected") {
+          setErrorMessage(res.payload)
+          setLoading(false)
+          return
+        }
+        dispatch(showNotification({ message: "New event Added!", status: 1 }));
+        setLoading(false)
+        closeModal();
+      }).catch((err) => {
+        console.error(err)
+        setLoading(false)
+      })
     }
   };
 
@@ -57,19 +56,37 @@ function AddEventModalBody({ closeModal }) {
     seteventObj({ ...eventObj, [updateType]: value });
   };
 
-  const options = [
-    { value: "ConferenceHall", name: "Conference Hall" },
-    { value: "OutDoorDinning", name: "OutDoor Dinning" },
-    { value: "GuestApartment", name: "Guest Apartment" },
-    { value: "OfficeRental", name: "Office Rental" },
-    { value: "BeautySalon", name: "Beauty Salon" },
-    { value: "BillBoardAdverting", name: "BillBoard Adverting" },
-    // Add more options as needed
-  ];
-  const [selectedOptions, setSelectedOptions] = useState([]);
-  const handleImageUpload = (value) => {
-    console.log(value);
-    // handle the uploaded image here
+  const handleFileChange = (event) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const newSelectedFiles = [...selectedFiles, ...files];
+      setSelectedFiles(newSelectedFiles);
+      displayImagePreviews(newSelectedFiles);
+    }
+  };
+
+  const displayImagePreviews = (files) => {
+    const urls = [];
+    for (let i = 0; i < files.length; i++) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        urls.push(reader.result);
+        if (urls.length === files.length) {
+          setPreviews(urls);
+        }
+      };
+      reader.readAsDataURL(files[i]);
+    }
+  };
+
+  const removeImage = (index) => {
+    const newSelectedFiles = [...selectedFiles];
+    newSelectedFiles.splice(index, 1);
+    setSelectedFiles(newSelectedFiles);
+
+    const newImagePreviewUrls = [...previews];
+    newImagePreviewUrls.splice(index, 1);
+    setPreviews(newImagePreviewUrls);
   };
 
   return (
@@ -79,41 +96,16 @@ function AddEventModalBody({ closeModal }) {
         defaultValue={eventObj.name}
         updateType="name"
         containerStyle="mt-4"
-        labelTitle="Name"
+        labelTitle="Title"
         updateFormValue={updateFormValue}
       />
       <InputText
         type="text"
-        defaultValue={eventObj.location}
-        updateType="location"
+        defaultValue={eventObj.category}
+        updateType="category"
         containerStyle="mt-4"
-        labelTitle="Location"
+        labelTitle="Category"
         updateFormValue={updateFormValue}
-      />
-      <SelectBox
-        labelTitle="Select Event Category"
-        defaultValue={selectedOptions}
-        options={options}
-        containerStyle="my-4 w-full"
-        placeholder="Select Category"
-        labelStyle="text-lg"
-        updateType="options"
-        updateFormValue={updateFormValue}
-      />
-      <InputText
-        type="date"
-        defaultValue={eventObj.date}
-        updateType="name"
-        containerStyle="mt-4"
-        labelTitle="Name"
-        updateFormValue={updateFormValue}
-      />
-      <ImageUploader
-        labelTitle="Upload an image"
-        containerStyle="my-4"
-        defaultValue={eventObj.image}
-        updateFormValue={handleImageUpload}
-        updateType="image"
       />
       <TextAreaInput
         labelTitle="Enter your event discription"
@@ -121,10 +113,28 @@ function AddEventModalBody({ closeModal }) {
         type="text"
         containerStyle="my-4"
         defaultValue={eventObj.description}
-        placeholder="Type your description here"
         updateFormValue={updateFormValue}
-        updateType="message"
+        updateType="description"
       />
+
+      <p style={{ marginTop: 20 }}>Image</p>
+      <input
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={handleFileChange} className="input  input-bordered w-full mt-2" />
+
+      <ul style={{ display: 'flex', flexWrap: 'wrap', marginTop: 20 }}>
+        {previews?.map((url, index) => (
+          <div style={{ width: "32%", margin: 2 }}>
+            <img key={index} src={url} alt={`Image Preview ${index + 1}`}
+              style={{ width: "100%", height: '80%', display: 'flex', border: '1px solid #ccc', cursor: 'pointer' }} />
+            <p style={{ textAlign: 'right', cursor: 'pointer', color: 'red' }}
+              onClick={() => removeImage(index)}
+            >remove</p>
+          </div>
+        ))}
+      </ul>
 
       <ErrorText styleClass="mt-16">{errorMessage}</ErrorText>
       <div className="modal-action">
@@ -132,7 +142,7 @@ function AddEventModalBody({ closeModal }) {
           Cancel
         </button>
         <button className="btn btn-primary px-6" onClick={() => saveNewEvent()}>
-          Save
+          {loading ? "Loading..." : "Save"}
         </button>
       </div>
     </>

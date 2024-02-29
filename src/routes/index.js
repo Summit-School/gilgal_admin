@@ -11,7 +11,7 @@ const Rooms = lazy(() => import('../pages/protected/Rooms'))
 const Testimony = lazy(() => import('../pages/protected/Testimony'))
 const Gallery = lazy(() => import('../pages/protected/Gallery'))
 const Events = lazy(() => import('../pages/protected/Events'))
-const Partners = lazy(() => import('../pages/protected/Partners'))
+const Categories = lazy(() => import('../pages/protected/Categories'))
 // const News = lazy(() => import('../pages/protected/News'))
 // const Team = lazy(() => import('../pages/protected/Team'))
 // const Programs = lazy(() => import('../pages/protected/Programs'))
@@ -55,8 +55,8 @@ const routes = [
     component: Events,
   },
   {
-    path: '/partners',
-    component: Partners,
+    path: '/categories',
+    component: Categories,
   },
   // {
   //   path: '/news',

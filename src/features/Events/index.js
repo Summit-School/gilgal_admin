@@ -1,16 +1,16 @@
-import moment from "moment";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import TitleCard from "../../components/Cards/TitleCard";
 import { openModal } from "../common/modalSlice";
-import { getEventContent, deleteEvents } from "./eventSlice";
 import {
   CONFIRMATION_MODAL_CLOSE_TYPES,
   MODAL_BODY_TYPES,
 } from "../../utils/globalConstantUtil";
 import TrashIcon from "@heroicons/react/24/outline/TrashIcon";
+import PencilSquareIcon from "@heroicons/react/24/outline/PencilSquareIcon";
 import { showNotification } from "../common/headerSlice";
 import SearchBar from "../../components/Input/SearchBar";
+import { getEvents } from "../../app/reducers/app";
 
 const TopSideButtons = () => {
   const dispatch = useDispatch();
@@ -40,22 +40,54 @@ const TopSideButtons = () => {
 
 function Events() {
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false)
+  const [events, setEvents] = useState([])
+
+  const handlerGetEvents = async () => {
+    try {
+      setLoading(true)
+      await dispatch(getEvents()).then((res) => {
+        if (res.meta.requestStatus === "rejected") {
+          showNotification({ message: res.payload, status: 0 })
+          setLoading(false)
+          return
+        }
+        setEvents(res.payload)
+        setLoading(false)
+      }).catch((err) => {
+        console.error(err)
+        setLoading(false)
+      })
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   useEffect(() => {
-    dispatch(getEventContent());
-  }, []);
+    handlerGetEvents()
+  }, [])
 
-  const dbData = false;
+  const updateCurrentEvent = (item) => {
+    dispatch(
+      openModal({
+        title: "Update Event",
+        bodyType: MODAL_BODY_TYPES.UPDATE_EVENT,
+        extraObject: {
+          item,
+        },
+      })
+    );
+  };
 
-  const deleteCurrentEvent = (index) => {
+  const deleteCurrentEvent = (item) => {
     dispatch(
       openModal({
         title: "Confirmation",
         bodyType: MODAL_BODY_TYPES.CONFIRMATION,
         extraObject: {
-          message: `Are you sure you want to delete this Event?`,
+          message: `Are you sure you want to delete ${item.title}?`,
           type: CONFIRMATION_MODAL_CLOSE_TYPES.EVENT_DELETE,
-          index,
+          item,
         },
       })
     );
@@ -64,7 +96,7 @@ function Events() {
   return (
     <>
       <TitleCard
-        title="Current Events"
+        title="Events"
         topMargin="mt-2"
         TopSideButtons={<TopSideButtons />}
       >
@@ -73,43 +105,53 @@ function Events() {
           <table className="table w-full">
             <thead>
               <tr>
-                <th>Name</th>
+                <th>Title</th>
                 <th>Category </th>
-                <th>Event_Date</th>
-                <th>image</th>
-                <th>Location</th>
-                <th>Description</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>
-                  <div>
-                    <div className="font-bold">John</div>
-                  </div>
-                </td>
-                <td>Wedding</td>
-                <td>02/04/2024</td>
-                <td>img/thre/thid/juyt/ionp.jpeg</td>
-                <td>City Hall</td>
-                <td>City the the </td>
-                <td>
-                  <button
-                    className="btn btn-square btn-ghost"
-                    onClick={() => deleteCurrentEvent(1)}
-                  >
-                    <TrashIcon className="w-5" />
-                  </button>
-                </td>
-              </tr>
-              {dbData === false && (
-                <tr>
-                  <td colSpan="6" className="text-center py-4">
+              {events.length > 0 ?
+                events.map((item, index) => {
+                  return (
+                    <tr key={index}>
+                      <td>
+                        <div className="flex items-center space-x-3">
+                          <div className="avatar">
+                            <div className="mask mask-circle w-12 h-12">
+                              <img
+                                src={`http://localhost:5005/uploads/gallery/${item?.image[0]}`}
+                                alt="Image"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <div className="font-bold">{item.title}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>{item?.category}</td>
+                      <td>
+                        <button
+                          className="btn btn-square btn-ghost"
+                          onClick={() => updateCurrentEvent(item)}
+                        >
+                          <PencilSquareIcon className="w-5" />
+                        </button>
+                        <button
+                          className="btn btn-square btn-ghost"
+                          onClick={() => deleteCurrentEvent(item)}
+                        >
+                          <TrashIcon className="w-5" />
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                }) : <tr>
+                  <td colSpan="3" className="text-center py-4">
                     No records found
                   </td>
-                </tr>
-              )}
+                </tr>}
             </tbody>
           </table>
         </div>

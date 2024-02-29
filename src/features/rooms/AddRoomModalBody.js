@@ -23,6 +23,7 @@ function AddRoomModalBody({ closeModal }) {
   const [service, setService] = useState("")
   const [services, setServices] = useState([])
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [previews, setPreviews] = useState([])
   const [roomObj, setroomObj] = useState(INITIAL_ROOM_OBJ);
 
   const saveNewRoom = async () => {
@@ -38,6 +39,7 @@ function AddRoomModalBody({ closeModal }) {
     else if (roomObj.desc.trim() === "")
       return setErrorMessage("Description is required!");
     else {
+      setLoading(true)
       const formData = new FormData();
       formData.append('image1', selectedFiles[0]);
       formData.append('image2', selectedFiles[1]);
@@ -75,10 +77,7 @@ function AddRoomModalBody({ closeModal }) {
 
   const handleAddService = () => {
     if (service) {
-      console.log(services)
       const updatedServices = [...services, service];
-      console.log(updatedServices)
-
       setServices(updatedServices);
       setService("")
     } else {
@@ -93,7 +92,35 @@ function AddRoomModalBody({ closeModal }) {
 
   const handleFileChange = (event) => {
     const files = event.target.files;
-    setSelectedFiles(files);
+    if (files && files.length > 0) {
+      const newSelectedFiles = [...selectedFiles, ...files];
+      setSelectedFiles(newSelectedFiles);
+      displayImagePreviews(newSelectedFiles);
+    }
+  };
+
+  const displayImagePreviews = (files) => {
+    const urls = [];
+    for (let i = 0; i < files.length; i++) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        urls.push(reader.result);
+        if (urls.length === files.length) {
+          setPreviews(urls);
+        }
+      };
+      reader.readAsDataURL(files[i]);
+    }
+  };
+
+  const removeImage = (index) => {
+    const newSelectedFiles = [...selectedFiles];
+    newSelectedFiles.splice(index, 1);
+    setSelectedFiles(newSelectedFiles);
+
+    const newImagePreviewUrls = [...previews];
+    newImagePreviewUrls.splice(index, 1);
+    setPreviews(newImagePreviewUrls);
   };
 
   return (
@@ -153,19 +180,6 @@ function AddRoomModalBody({ closeModal }) {
         updateFormValue={updateFormValue}
       />
 
-      <p style={{ marginTop: 20 }}>Images</p>
-      <input
-        type="file"
-        accept="image/*"
-        multiple
-        onChange={handleFileChange} className="input  input-bordered w-full mt-2" />
-
-      <ul>
-        {selectedFiles && Array.from(selectedFiles).map((file, index) => (
-          <li key={index}>{file.name}</li>
-        ))}
-      </ul>
-
       <TextAreaInput
         defaultValue={roomObj.desc}
         updateType="desc"
@@ -173,6 +187,27 @@ function AddRoomModalBody({ closeModal }) {
         labelTitle="Description"
         updateFormValue={updateFormValue}
       />
+
+      <p style={{ marginTop: 20 }}>Images</p>
+      <input
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={handleFileChange} className="input  input-bordered w-full mt-2" />
+
+      <ul style={{ display: 'flex', flexWrap: 'wrap', marginTop: 20 }}>
+        {previews?.map((url, index) => (
+          <div style={{ width: "32%", margin: 2 }}>
+            <img key={index} src={url} alt={`Image Preview ${index + 1}`}
+              style={{ width: "100%", height: '80%', display: 'flex', border: '1px solid #ccc', cursor: 'pointer' }} />
+            <p style={{ textAlign: 'right', cursor: 'pointer', color: 'red' }}
+              onClick={() => removeImage(index)}
+            >remove</p>
+          </div>
+        ))}
+      </ul>
+
+
 
       <ErrorText styleClass="mt-16">{errorMessage}</ErrorText>
       <div className="modal-action">

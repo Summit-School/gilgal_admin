@@ -11,16 +11,16 @@ import TrashIcon from "@heroicons/react/24/outline/TrashIcon";
 import PencilSquareIcon from "@heroicons/react/24/outline/PencilSquareIcon";
 import { showNotification } from "../common/headerSlice";
 import SearchBar from "../../components/Input/SearchBar";
-import { getRooms } from "../../app/reducers/app";
+import { getCategories } from "../../app/reducers/app";
 
 const TopSideButtons = () => {
   const dispatch = useDispatch();
 
-  const openAddNewRoomModal = () => {
+  const openAddNewPartnerModal = () => {
     dispatch(
       openModal({
-        title: "Add New Room",
-        bodyType: MODAL_BODY_TYPES.ADD_NEW_ROOM,
+        title: "Add New Category",
+        bodyType: MODAL_BODY_TYPES.ADD_NEW_CATEGORY,
       })
     );
   };
@@ -31,7 +31,7 @@ const TopSideButtons = () => {
 
       <button
         className="btn mx-3 px-6 btn-sm normal-case btn-primary"
-        onClick={() => openAddNewRoomModal()}
+        onClick={() => openAddNewPartnerModal()}
       >
         Add New
       </button>
@@ -39,21 +39,21 @@ const TopSideButtons = () => {
   );
 };
 
-function Rooms() {
+function CategoryPage() {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false)
-  const [rooms, setRooms] = useState([])
+  const [data, setData] = useState([])
 
-  const handlerGetRooms = async () => {
+  const handlerGetCategories = async () => {
     try {
       setLoading(true)
-      await dispatch(getRooms()).then((res) => {
+      await dispatch(getCategories()).then((res) => {
         if (res.meta.requestStatus === "rejected") {
           showNotification({ message: res.payload, status: 0 })
           setLoading(false)
           return
         }
-        setRooms(res.payload)
+        setData(res.payload)
         setLoading(false)
       }).catch((err) => {
         console.error(err)
@@ -65,14 +65,14 @@ function Rooms() {
   }
 
   useEffect(() => {
-    handlerGetRooms()
+    handlerGetCategories()
   }, [])
 
-  const updateCurrentRoom = (item) => {
+  const updateCurrentCategory = (item) => {
     dispatch(
       openModal({
-        title: "Update Room",
-        bodyType: MODAL_BODY_TYPES.UPDATE_ROOM,
+        title: "Update Category",
+        bodyType: MODAL_BODY_TYPES.UPDATE_CATEGORY,
         extraObject: {
           item,
         },
@@ -80,14 +80,14 @@ function Rooms() {
     );
   };
 
-  const deleteCurrentRoom = (item) => {
+  const deleteCurrentCategory = (item) => {
     dispatch(
       openModal({
         title: "Confirmation",
         bodyType: MODAL_BODY_TYPES.CONFIRMATION,
         extraObject: {
           message: `Are you sure you want to delete ${item.title}?`,
-          type: CONFIRMATION_MODAL_CLOSE_TYPES.ROOM_DELETE,
+          type: CONFIRMATION_MODAL_CLOSE_TYPES.CATEGORY_DELETE,
           item,
         },
       })
@@ -97,7 +97,7 @@ function Rooms() {
   return (
     <>
       <TitleCard
-        title="Rooms"
+        title="Categories"
         topMargin="mt-2"
         TopSideButtons={<TopSideButtons />}
       >
@@ -107,53 +107,27 @@ function Rooms() {
             <thead>
               <tr>
                 <th>Title</th>
-                <th>Price</th>
-                <th>size</th>
-                <th>Capacity</th>
-                <th>Bed</th>
-                <th>Service</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              {rooms.length > 0 ?
-                rooms.map((item, index) => {
+              {data.length > 0 ?
+                data.map((item, index) => {
                   return (
                     <tr key={index}>
                       <td>
-                        <div className="flex items-center space-x-3">
-                          <div className="avatar">
-                            <div className="mask mask-circle w-12 h-12">
-                              <img
-                                src={`http://localhost:5005/uploads/gallery/${item?.images[0]}`}
-                                alt="Image"
-                              />
-                            </div>
-                          </div>
-                          <div>
-                            <div className="font-bold">{item.title}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td>{item.price}</td>
-                      <td>{item.size}</td>
-                      <td>{item.capacity}</td>
-                      <td>{item.bed} bed</td>
-                      <td style={{ maxWidth: 220, display: 'flex', flexWrap: 'wrap' }}>
-                        {item?.services[0].split(",").map((item) => (
-                          <span style={{ marginRight: 10 }}>{item},</span>
-                        ))}
+                        {item?.title}
                       </td>
                       <td>
                         <button
                           className="btn btn-square btn-ghost"
-                          onClick={() => updateCurrentRoom(item)}
+                          onClick={() => updateCurrentCategory(item)}
                         >
                           <PencilSquareIcon className="w-5" />
                         </button>
                         <button
                           className="btn btn-square btn-ghost"
-                          onClick={() => deleteCurrentRoom(item)}
+                          onClick={() => deleteCurrentCategory(item)}
                         >
                           <TrashIcon className="w-5" />
                         </button>
@@ -161,7 +135,7 @@ function Rooms() {
                     </tr>
                   )
                 }) : <tr>
-                  <td colSpan="6" className="text-center py-4">
+                  <td colSpan="3" className="text-center py-4">
                     No records found
                   </td>
                 </tr>}
@@ -173,4 +147,4 @@ function Rooms() {
   );
 }
 
-export default Rooms;
+export default CategoryPage;
