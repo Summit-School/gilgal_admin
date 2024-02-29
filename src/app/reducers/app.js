@@ -43,12 +43,49 @@ export const addRoom = createAsyncThunk(
     }
 );
 
+export const updateRoom = createAsyncThunk(
+    "app/updateRoom",
+    async (data, thunkAPI) => {
+        try {
+            const response = await axios.put(`${base_url}/rooms/update-room/${data.id}`, data.formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            return response.data;
+        } catch (error) {
+            const message =
+                (error.message && error.response.data && error.response.data.message) ||
+                error.message ||
+                error.toString();
+
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+);
+
+export const deleteRoom = createAsyncThunk(
+    "app/deleteRoom",
+    async (id, thunkAPI) => {
+        try {
+            const response = await axios.delete(`${base_url}/rooms/delete-room/${id}`);
+            return response.data;
+        } catch (error) {
+            const message =
+                (error.message && error.response.data && error.response.data.message) ||
+                error.message ||
+                error.toString();
+
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+);
+
 
 export const appSlice = createSlice({
     name: "app",
     initialState,
-    reducers: {
-    },
+    reducers: {},
 
 });
 

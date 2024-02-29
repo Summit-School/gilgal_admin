@@ -16,8 +16,6 @@ import { getRooms } from "../../app/reducers/app";
 const TopSideButtons = () => {
   const dispatch = useDispatch();
 
-  const [loading, setLoading] = useState(false)
-
   const openAddNewRoomModal = () => {
     dispatch(
       openModal({
@@ -26,8 +24,6 @@ const TopSideButtons = () => {
       })
     );
   };
-
-
 
   return (
     <div className="">
@@ -84,15 +80,15 @@ function Rooms() {
     );
   };
 
-  const deleteCurrentRoom = (index) => {
+  const deleteCurrentRoom = (item) => {
     dispatch(
       openModal({
         title: "Confirmation",
         bodyType: MODAL_BODY_TYPES.CONFIRMATION,
         extraObject: {
-          message: `Are you sure you want to delete this room?`,
+          message: `Are you sure you want to delete ${item.title}?`,
           type: CONFIRMATION_MODAL_CLOSE_TYPES.ROOM_DELETE,
-          index,
+          item,
         },
       })
     );
@@ -158,7 +154,7 @@ function Rooms() {
                         </button>
                         <button
                           className="btn btn-square btn-ghost"
-                          onClick={() => deleteCurrentRoom(1)}
+                          onClick={() => deleteCurrentRoom(item)}
                         >
                           <TrashIcon className="w-5" />
                         </button>

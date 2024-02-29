@@ -75,10 +75,7 @@ function AddRoomModalBody({ closeModal }) {
 
   const handleAddService = () => {
     if (service) {
-      console.log(services)
       const updatedServices = [...services, service];
-      console.log(updatedServices)
-
       setServices(updatedServices);
       setService("")
     } else {

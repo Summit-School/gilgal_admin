@@ -1,5 +1,4 @@
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
 import {
   CONFIRMATION_MODAL_CLOSE_TYPES,
   MODAL_CLOSE_TYPES,
@@ -9,16 +8,31 @@ import { deleteTestimony } from "../../Testimony/testimonySlice";
 import { deleteGallery } from "../../Gallery/gallerySlice";
 import { deleteEvents } from "../../Events/eventSlice";
 
+import { deleteRoom } from "../../../app/reducers/app";
+import { useState } from "react";
+
 function ConfirmationModalBody({ extraObject, closeModal }) {
+  const [loading, setLoading] = useState(false)
   const dispatch = useDispatch();
 
-  const { message, type, _id, index } = extraObject;
+  const { message, type, item, index } = extraObject;
 
   const proceedWithYes = async () => {
     if (type === CONFIRMATION_MODAL_CLOSE_TYPES.ROOM_DELETE) {
-      // positive response, call api or dispatch redux function
-      // dispatch(deleteRoom({ index }));
-      dispatch(showNotification({ message: "Room Deleted!", status: 1 }));
+      setLoading(true)
+      dispatch(deleteRoom(item._id)).then((res) => {
+        if (res.meta.requestStatus === "rejected") {
+          dispatch(showNotification({ message: res.payload, status: 0 }));
+          setLoading(false)
+          return
+        }
+        dispatch(showNotification({ message: `Room ${item.title} Deleted!`, status: 1 }));
+        setLoading(false)
+        return
+      }).catch((err) => {
+        console.error(err)
+        setLoading(false)
+      })
     }
     else if (type === CONFIRMATION_MODAL_CLOSE_TYPES.TESTIMONY_DELETE) {
       // positive response, call api or dispatch redux function
@@ -66,7 +80,7 @@ function ConfirmationModalBody({ extraObject, closeModal }) {
           className="btn btn-primary w-36"
           onClick={() => proceedWithYes()}
         >
-          Yes
+          {loading ? "Loading..." : "Yes"}
         </button>
       </div>
     </>
