@@ -118,7 +118,6 @@ function Rooms() {
             <tbody>
               {rooms.length > 0 ?
                 rooms.map((item, index) => {
-                  console.log(`http://localhost:5005/uploads/gallery/${item?.images[0]}`)
                   return (
                     <tr key={index}>
                       <td>

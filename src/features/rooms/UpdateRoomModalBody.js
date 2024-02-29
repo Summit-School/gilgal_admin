@@ -18,6 +18,7 @@ function UpdateRoomModalBody({ closeModal, extraObject }) {
   const [services, setServices] = useState([])
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [images, setImages] = useState([])
+  const [previews, setPreviews] = useState([])
 
   const { item } = extraObject
 
@@ -81,7 +82,35 @@ function UpdateRoomModalBody({ closeModal, extraObject }) {
 
   const handleFileChange = (event) => {
     const files = event.target.files;
-    setSelectedFiles(files);
+    if (files && files.length > 0) {
+      const newSelectedFiles = [...selectedFiles, ...files];
+      setSelectedFiles(newSelectedFiles);
+      displayImagePreviews(newSelectedFiles);
+    }
+  };
+
+  const displayImagePreviews = (files) => {
+    const urls = [];
+    for (let i = 0; i < files.length; i++) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        urls.push(reader.result);
+        if (urls.length === files.length) {
+          setPreviews(urls);
+        }
+      };
+      reader.readAsDataURL(files[i]);
+    }
+  };
+
+  const removeImage = (index) => {
+    const newSelectedFiles = [...selectedFiles];
+    newSelectedFiles.splice(index, 1);
+    setSelectedFiles(newSelectedFiles);
+
+    const newImagePreviewUrls = [...previews];
+    newImagePreviewUrls.splice(index, 1);
+    setPreviews(newImagePreviewUrls);
   };
 
   useEffect(() => {
@@ -125,6 +154,10 @@ function UpdateRoomModalBody({ closeModal, extraObject }) {
       <p style={{ marginTop: 20 }}>Number of Beds</p>
       <input type="text" value={bed} onChange={(e) => setBed(e.target.value)} className="input input-bordered w-full mt-2" />
 
+      <p style={{ marginTop: 20 }}>Description</p>
+      <textarea className="textarea textarea-bordered w-full" value={desc}>
+
+      </textarea>
 
       <p style={{ marginTop: 20 }}>Images</p>
       <input
@@ -133,22 +166,32 @@ function UpdateRoomModalBody({ closeModal, extraObject }) {
         multiple
         onChange={handleFileChange} className="input  input-bordered w-full mt-2" />
 
-      <ul>
-        {selectedFiles && Array.from(selectedFiles).map((file, index) => (
-          <li key={index}>{file.name}</li>
+      <ul style={{ display: 'flex', flexWrap: 'wrap', marginTop: 20 }}>
+        {previews?.map((url, index) => (
+          <div style={{ width: "32%", margin: 2 }}>
+            <img key={index} src={url} alt={`Image Preview ${index + 1}`}
+              style={{ width: "100%", height: '80%', display: 'flex', border: '1px solid #ccc', cursor: 'pointer' }} />
+            <p style={{ textAlign: 'right', cursor: 'pointer', color: 'red' }}
+              onClick={() => removeImage(index)}
+            >remove</p>
+          </div>
         ))}
       </ul>
 
-      <ul>
+      <ul style={{ display: 'flex', flexWrap: 'wrap', marginTop: 40 }}>
         {images && Array.from(images).map((file, index) => (
-          <li key={index}>{file}</li>
+          <div style={{ width: "32%", margin: 2, }}>
+            <img
+              style={{ width: "100%", height: "100%", border: '1px solid #ccc', cursor: 'pointer' }}
+              src={`${process.env.REACT_APP_BASE_URL}/uploads/gallery/${file}`}
+              alt="Image"
+            />
+            {/* <p style={{ textAlign: 'right', cursor: 'pointer', color: 'red' }}>delete</p> */}
+          </div>
         ))}
       </ul>
 
-      <p style={{ marginTop: 20 }}>Description</p>
-      <textarea className="textarea textarea-bordered w-full" value={desc}>
 
-      </textarea>
 
       <ErrorText styleClass="mt-16">{errorMessage}</ErrorText>
       <div className="modal-action">
