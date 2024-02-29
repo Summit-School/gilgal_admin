@@ -39,6 +39,7 @@ function AddRoomModalBody({ closeModal }) {
     else if (roomObj.desc.trim() === "")
       return setErrorMessage("Description is required!");
     else {
+      setLoading(true)
       const formData = new FormData();
       formData.append('image1', selectedFiles[0]);
       formData.append('image2', selectedFiles[1]);

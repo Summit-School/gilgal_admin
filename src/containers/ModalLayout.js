@@ -8,12 +8,10 @@ import AddRoomModalBody from "../features/rooms/AddRoomModalBody";
 import UpdateRoomModalBody from "../features/rooms/UpdateRoomModalBody";
 
 import AddEventModalBody from "../features/Events/AddEventModalBody";
-import AddPartnerModalBody from "../features/Partners/AddPartnerModalBody";
-import AddNewsModalBody from "../features/News/AddNewsModalBody";
-import AddTeamModalBody from "../features/Team/AddTeamModalBody";
-import AddProgramModalBody from "../features/Programs/AddProgramModalBody";
-import AddHostCenterModalBody from "../features/HostCenters/AddHostCenterModalBody";
-import AddCourseModalBody from "../features/Courses/AddCourseModalBody";
+import UpdateEventModalBody from "../features/Events/UpdateEventModalBody";
+
+import AddCategoryModalBody from "../features/Categories/AddCategoryModalBody";
+import UpdateCategoryModalBody from "../features/Categories/UpdateCategoryModalBody";
 
 
 function ModalLayout() {
@@ -57,60 +55,40 @@ function ModalLayout() {
                 />
               ),
 
-              [MODAL_BODY_TYPES.ADD_NEW_TESTIMONY]: (
-                <AddTestimonyModalBody
-                  closeModal={close}
-                  extraObject={extraObject}
-                />
-              ),
-              [MODAL_BODY_TYPES.ADD_NEW_GALLERY]: (
-                <AddGalleryModalBody
-                  closeModal={close}
-                  extraObject={extraObject}
-                />
-              ),
               [MODAL_BODY_TYPES.ADD_NEW_EVENT]: (
                 <AddEventModalBody
                   closeModal={close}
                   extraObject={extraObject}
                 />
               ),
-              [MODAL_BODY_TYPES.ADD_NEW_PARTNER]: (
-                <AddPartnerModalBody
+              [MODAL_BODY_TYPES.UPDATE_EVENT]: (
+                <UpdateEventModalBody
                   closeModal={close}
                   extraObject={extraObject}
                 />
               ),
-              [MODAL_BODY_TYPES.ADD_NEW_NEWS]: (
-                <AddNewsModalBody
+
+              [MODAL_BODY_TYPES.ADD_NEW_CATEGORY]: (
+                <AddCategoryModalBody
                   closeModal={close}
                   extraObject={extraObject}
                 />
               ),
-              [MODAL_BODY_TYPES.ADD_NEW_HOSTCENTER]: (
-                <AddHostCenterModalBody
+              [MODAL_BODY_TYPES.UPDATE_CATEGORY]: (
+                <UpdateCategoryModalBody
                   closeModal={close}
                   extraObject={extraObject}
                 />
               ),
-              [MODAL_BODY_TYPES.ADD_NEW_TEAM]: (
-                <AddTeamModalBody
+
+              [MODAL_BODY_TYPES.ADD_NEW_GALLERY]: (
+                <AddGalleryModalBody
                   closeModal={close}
                   extraObject={extraObject}
                 />
               ),
-              [MODAL_BODY_TYPES.ADD_NEW_PROGRAMS]: (
-                <AddProgramModalBody
-                  closeModal={close}
-                  extraObject={extraObject}
-                />
-              ),
-              [MODAL_BODY_TYPES.ADD_NEW_COURSE]: (
-                <AddCourseModalBody
-                  closeModal={close}
-                  extraObject={extraObject}
-                />
-              ),
+
+
               [MODAL_BODY_TYPES.CONFIRMATION]: (
                 <ConfirmationModalBody
                   extraObject={extraObject}

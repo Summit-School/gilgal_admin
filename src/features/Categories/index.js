@@ -1,3 +1,4 @@
+import moment from "moment";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import TitleCard from "../../components/Cards/TitleCard";
@@ -10,16 +11,16 @@ import TrashIcon from "@heroicons/react/24/outline/TrashIcon";
 import PencilSquareIcon from "@heroicons/react/24/outline/PencilSquareIcon";
 import { showNotification } from "../common/headerSlice";
 import SearchBar from "../../components/Input/SearchBar";
-import { getEvents } from "../../app/reducers/app";
+import { getCategories } from "../../app/reducers/app";
 
 const TopSideButtons = () => {
   const dispatch = useDispatch();
 
-  const openAddNewEventModal = () => {
+  const openAddNewPartnerModal = () => {
     dispatch(
       openModal({
-        title: "Add New Event",
-        bodyType: MODAL_BODY_TYPES.ADD_NEW_EVENT,
+        title: "Add New Category",
+        bodyType: MODAL_BODY_TYPES.ADD_NEW_CATEGORY,
       })
     );
   };
@@ -30,7 +31,7 @@ const TopSideButtons = () => {
 
       <button
         className="btn mx-3 px-6 btn-sm normal-case btn-primary"
-        onClick={() => openAddNewEventModal()}
+        onClick={() => openAddNewPartnerModal()}
       >
         Add New
       </button>
@@ -38,21 +39,21 @@ const TopSideButtons = () => {
   );
 };
 
-function Events() {
+function CategoryPage() {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false)
-  const [events, setEvents] = useState([])
+  const [data, setData] = useState([])
 
-  const handlerGetEvents = async () => {
+  const handlerGetCategories = async () => {
     try {
       setLoading(true)
-      await dispatch(getEvents()).then((res) => {
+      await dispatch(getCategories()).then((res) => {
         if (res.meta.requestStatus === "rejected") {
           showNotification({ message: res.payload, status: 0 })
           setLoading(false)
           return
         }
-        setEvents(res.payload)
+        setData(res.payload)
         setLoading(false)
       }).catch((err) => {
         console.error(err)
@@ -64,14 +65,14 @@ function Events() {
   }
 
   useEffect(() => {
-    handlerGetEvents()
+    handlerGetCategories()
   }, [])
 
-  const updateCurrentEvent = (item) => {
+  const updateCurrentCategory = (item) => {
     dispatch(
       openModal({
-        title: "Update Event",
-        bodyType: MODAL_BODY_TYPES.UPDATE_EVENT,
+        title: "Update Category",
+        bodyType: MODAL_BODY_TYPES.UPDATE_CATEGORY,
         extraObject: {
           item,
         },
@@ -79,14 +80,14 @@ function Events() {
     );
   };
 
-  const deleteCurrentEvent = (item) => {
+  const deleteCurrentCategory = (item) => {
     dispatch(
       openModal({
         title: "Confirmation",
         bodyType: MODAL_BODY_TYPES.CONFIRMATION,
         extraObject: {
           message: `Are you sure you want to delete ${item.title}?`,
-          type: CONFIRMATION_MODAL_CLOSE_TYPES.EVENT_DELETE,
+          type: CONFIRMATION_MODAL_CLOSE_TYPES.CATEGORY_DELETE,
           item,
         },
       })
@@ -96,7 +97,7 @@ function Events() {
   return (
     <>
       <TitleCard
-        title="Events"
+        title="Categories"
         topMargin="mt-2"
         TopSideButtons={<TopSideButtons />}
       >
@@ -106,41 +107,27 @@ function Events() {
             <thead>
               <tr>
                 <th>Title</th>
-                <th>Category </th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              {events.length > 0 ?
-                events.map((item, index) => {
+              {data.length > 0 ?
+                data.map((item, index) => {
                   return (
                     <tr key={index}>
                       <td>
-                        <div className="flex items-center space-x-3">
-                          <div className="avatar">
-                            <div className="mask mask-circle w-12 h-12">
-                              <img
-                                src={`http://localhost:5005/uploads/gallery/${item?.image[0]}`}
-                                alt="Image"
-                              />
-                            </div>
-                          </div>
-                          <div>
-                            <div className="font-bold">{item.title}</div>
-                          </div>
-                        </div>
+                        {item?.title}
                       </td>
-                      <td>{item?.category}</td>
                       <td>
                         <button
                           className="btn btn-square btn-ghost"
-                          onClick={() => updateCurrentEvent(item)}
+                          onClick={() => updateCurrentCategory(item)}
                         >
                           <PencilSquareIcon className="w-5" />
                         </button>
                         <button
                           className="btn btn-square btn-ghost"
-                          onClick={() => deleteCurrentEvent(item)}
+                          onClick={() => deleteCurrentCategory(item)}
                         >
                           <TrashIcon className="w-5" />
                         </button>
@@ -160,4 +147,4 @@ function Events() {
   );
 }
 
-export default Events;
+export default CategoryPage;
