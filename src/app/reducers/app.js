@@ -295,6 +295,45 @@ export const updateGallery = createAsyncThunk(
     }
 );
 
+// 
+export const getBookings = createAsyncThunk(
+    "app/getBookings",
+    async (thunkAPI) => {
+        try {
+            const response = await axios.get(`${base_url}/booking/`);
+            return response.data;
+        } catch (error) {
+            const message =
+                (error.message && error.response.data && error.response.data.message) ||
+                error.message ||
+                error.toString();
+
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+);
+
+export const updateBooking = createAsyncThunk(
+    "app/updateBooking",
+    async (data, thunkAPI) => {
+        try {
+            const response = await axios.put(`${base_url}/booking/update/${data.id}`, data, {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+            return response.data;
+        } catch (error) {
+            const message =
+                (error.message && error.response.data && error.response.data.message) ||
+                error.message ||
+                error.toString();
+
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+);
+
 
 export const appSlice = createSlice({
     name: "app",

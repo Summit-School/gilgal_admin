@@ -13,6 +13,8 @@ import UpdateEventModalBody from "../features/Events/UpdateEventModalBody";
 import AddCategoryModalBody from "../features/Categories/AddCategoryModalBody";
 import UpdateCategoryModalBody from "../features/Categories/UpdateCategoryModalBody";
 
+import UpdateBookingModalBody from "../features/Bookings/UpdateBookingModalBody";
+
 
 function ModalLayout() {
   const { isOpen, bodyType, size, extraObject, title } = useSelector(
@@ -83,6 +85,13 @@ function ModalLayout() {
 
               [MODAL_BODY_TYPES.ADD_NEW_GALLERY]: (
                 <AddGalleryModalBody
+                  closeModal={close}
+                  extraObject={extraObject}
+                />
+              ),
+
+              [MODAL_BODY_TYPES.UPDATE_BOOKING]: (
+                <UpdateBookingModalBody
                   closeModal={close}
                   extraObject={extraObject}
                 />
