@@ -44,7 +44,7 @@ function UpdateRoomModalBody({ closeModal, extraObject }) {
           setLoading(false)
           return
         }
-        dispatch(showNotification({ message: "New room Added!", status: 1 }));
+        dispatch(showNotification({ message: "Room Updated!", status: 1 }));
         setLoading(false)
         closeModal();
       }).catch((err) => {
@@ -131,10 +131,10 @@ function UpdateRoomModalBody({ closeModal, extraObject }) {
       <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className="input input-bordered w-full mt-2" />
 
       <p style={{ marginTop: 20 }}>Price per night</p>
-      <input type="text" value={price} onChange={(e) => setTitle(e.target.value)} className="input input-bordered w-full mt-2" />
+      <input type="text" value={price} onChange={(e) => setPrice(e.target.value)} className="input input-bordered w-full mt-2" />
 
       <p style={{ marginTop: 20 }}>Room Size</p>
-      <input type="text" value={size} onChange={(e) => setTitle(e.target.value)} className="input input-bordered w-full mt-2" />
+      <input type="text" value={size} onChange={(e) => setSize(e.target.value)} className="input input-bordered w-full mt-2" />
 
       <p style={{ marginTop: 20 }}>Anemities</p>
       <p style={{ marginTop: 10 }}>{
@@ -149,7 +149,7 @@ function UpdateRoomModalBody({ closeModal, extraObject }) {
       </button>
 
       <p style={{ marginTop: 20 }}>Room Capacity</p>
-      <input type="text" value={capacity} onChange={(e) => setTitle(e.target.value)} className="input input-bordered w-full mt-2" />
+      <input type="text" value={capacity} onChange={(e) => setCapacity(e.target.value)} className="input input-bordered w-full mt-2" />
 
       <p style={{ marginTop: 20 }}>Number of Beds</p>
       <input type="text" value={bed} onChange={(e) => setBed(e.target.value)} className="input input-bordered w-full mt-2" />

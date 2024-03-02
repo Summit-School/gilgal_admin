@@ -25,7 +25,7 @@ const TopSideButtons = () => {
 
   return (
     <div className="">
-      <SearchBar />
+      {/* <SearchBar /> */}
 
       <button
         className="btn mx-3 px-6 btn-sm normal-case btn-primary"
