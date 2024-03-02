@@ -25,6 +25,9 @@ module.exports = Object.freeze({
 
     UPDATE_BOOKING: "UPDATE_BOOKING",
 
+    UPDATE_USER_EMAIL: "UPDATE_USER_EMAIL",
+    UPDATE_USER_PASSWORD: "UPDATE_USER_PASSWORD",
+
     DEFAULT: "",
   },
 

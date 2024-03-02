@@ -1,17 +1,22 @@
 import { themeChange } from 'theme-change'
 import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import BellIcon from '@heroicons/react/24/outline/BellIcon'
+// import BellIcon from '@heroicons/react/24/outline/BellIcon'
 import Bars3Icon from '@heroicons/react/24/outline/Bars3Icon'
 import MoonIcon from '@heroicons/react/24/outline/MoonIcon'
 import SunIcon from '@heroicons/react/24/outline/SunIcon'
-import { openRightDrawer } from '../features/common/rightDrawerSlice';
-import { RIGHT_DRAWER_TYPES } from '../utils/globalConstantUtil'
-
+// import { openRightDrawer } from '../features/common/rightDrawerSlice';
+// import { RIGHT_DRAWER_TYPES } from '../utils/globalConstantUtil'
 import { NavLink, Routes, Link, useLocation } from 'react-router-dom'
+import { openModal } from '../features/common/modalSlice'
+import { MODAL_BODY_TYPES } from '../utils/globalConstantUtil'
+// 
+import { decodeToken } from "react-jwt"
 
 
 function Header() {
+    const [userId, setUserId] = useState('')
+    const [email, setEmail] = useState("")
 
     const dispatch = useDispatch()
     const { noOfNotifications, pageTitle } = useSelector(state => state.header)
@@ -31,15 +36,48 @@ function Header() {
 
 
     // Opening right sidebar for notification
-    const openNotification = () => {
-        dispatch(openRightDrawer({ header: "Notifications", bodyType: RIGHT_DRAWER_TYPES.NOTIFICATION }))
-    }
+    // const openNotification = () => {
+    //     dispatch(openRightDrawer({ header: "Notifications", bodyType: RIGHT_DRAWER_TYPES.NOTIFICATION }))
+    // }
 
 
     function logoutUser() {
         localStorage.clear();
         window.location.href = '/'
     }
+
+    const user = localStorage.getItem("gilgal_towers_admin")
+    useEffect(() => {
+        if (user) {
+            const decodedToken = decodeToken(user)
+            setUserId(decodedToken.id)
+            setEmail(decodedToken.email)
+        }
+    }, [user])
+
+    const updateCurrentEmail = (item) => {
+        dispatch(
+            openModal({
+                title: "Update Email",
+                bodyType: MODAL_BODY_TYPES.UPDATE_USER_EMAIL,
+                extraObject: {
+                    item,
+                },
+            })
+        );
+    };
+
+    const updateCurrentPassword = (item) => {
+        dispatch(
+            openModal({
+                title: "Update Password",
+                bodyType: MODAL_BODY_TYPES.UPDATE_USER_PASSWORD,
+                extraObject: {
+                    item,
+                },
+            })
+        );
+    };
 
     return (
         // navbar fixed  flex-none justify-between bg-base-300  z-10 shadow-md
@@ -96,7 +134,15 @@ function Header() {
                             </div>
                         </label>
                         <ul tabIndex={0} className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
-                            <li className="justify-between">
+                            <li className="justify-between"
+                                onClick={() => updateCurrentEmail({ id: userId, email })}>
+                                <Link to={"#"}>
+                                    Update Email
+                                    <span className="badge">New</span>
+                                </Link>
+                            </li>
+                            <li className="justify-between"
+                                onClick={() => updateCurrentPassword({ id: userId, email })}>
                                 <Link to={"#"}>
                                     Update Password
                                     {/* <span className="badge">New</span> */}

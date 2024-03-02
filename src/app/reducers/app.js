@@ -334,6 +334,49 @@ export const updateBooking = createAsyncThunk(
     }
 );
 
+//
+export const updateUserEmail = createAsyncThunk(
+    "app/updateUserEmail",
+    async (data, thunkAPI) => {
+        try {
+            const response = await axios.put(`${base_url}/admin/update/${data.id}`, data, {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+            return response.data;
+        } catch (error) {
+            const message =
+                (error.message && error.response.data && error.response.data.message) ||
+                error.message ||
+                error.toString();
+
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+);
+
+export const updateUserPassword = createAsyncThunk(
+    "app/updateUserPassword",
+    async (data, thunkAPI) => {
+        try {
+            const response = await axios.put(`${base_url}/admin/update-password/${data.id}`, data, {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+            return response.data;
+        } catch (error) {
+            const message =
+                (error.message && error.response.data && error.response.data.message) ||
+                error.message ||
+                error.toString();
+
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+);
+
 
 export const appSlice = createSlice({
     name: "app",
