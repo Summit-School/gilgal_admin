@@ -14,6 +14,8 @@ import AddCategoryModalBody from "../features/Categories/AddCategoryModalBody";
 import UpdateCategoryModalBody from "../features/Categories/UpdateCategoryModalBody";
 
 import UpdateBookingModalBody from "../features/Bookings/UpdateBookingModalBody";
+import UpdatePasswordModal from "../features/user/UpdatePasswordModal";
+import UpdateEmailModal from "../features/user/UpdateEmailModal";
 
 
 function ModalLayout() {
@@ -92,6 +94,19 @@ function ModalLayout() {
 
               [MODAL_BODY_TYPES.UPDATE_BOOKING]: (
                 <UpdateBookingModalBody
+                  closeModal={close}
+                  extraObject={extraObject}
+                />
+              ),
+
+              [MODAL_BODY_TYPES.UPDATE_USER_PASSWORD]: (
+                <UpdatePasswordModal
+                  closeModal={close}
+                  extraObject={extraObject}
+                />
+              ),
+              [MODAL_BODY_TYPES.UPDATE_USER_EMAIL]: (
+                <UpdateEmailModal
                   closeModal={close}
                   extraObject={extraObject}
                 />
