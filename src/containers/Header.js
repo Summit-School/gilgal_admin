@@ -97,9 +97,9 @@ function Header() {
                         </label>
                         <ul tabIndex={0} className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
                             <li className="justify-between">
-                                <Link to={'/app/settings-profile'}>
-                                    Profile Settings
-                                    <span className="badge">New</span>
+                                <Link to={"#"}>
+                                    Update Password
+                                    {/* <span className="badge">New</span> */}
                                 </Link>
                             </li>
                             {/* <li className=''><Link to={'/app/settings-billing'}>Bill History</Link></li> */}
