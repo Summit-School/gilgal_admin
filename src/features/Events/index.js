@@ -120,7 +120,7 @@ function Events() {
                           <div className="avatar">
                             <div className="mask mask-circle w-12 h-12">
                               <img
-                                src={`http://localhost:5005/uploads/gallery/${item?.image[0]}`}
+                                src={`${process.env.REACT_APP_BASE_URL}/uploads/gallery/${item?.image[0]}`}
                                 alt="Image"
                               />
                             </div>
