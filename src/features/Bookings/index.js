@@ -5,7 +5,7 @@ import { showNotification } from "../common/headerSlice"
 import TitleCard from "../../components/Cards/TitleCard"
 // import FunnelIcon from '@heroicons/react/24/outline/FunnelIcon'
 import XMarkIcon from '@heroicons/react/24/outline/XMarkIcon'
-import SearchBar from "../../components/Input/SearchBar"
+// import SearchBar from "../../components/Input/SearchBar"
 import { getBookings, getRooms } from "../../app/reducers/app"
 import PencilSquareIcon from "@heroicons/react/24/outline/PencilSquareIcon";
 import { openModal } from "../common/modalSlice"
@@ -13,6 +13,7 @@ import {
     CONFIRMATION_MODAL_CLOSE_TYPES,
     MODAL_BODY_TYPES,
 } from "../../utils/globalConstantUtil";
+import { FilterFunnction } from "../../components/TableFilter/FilterFunction"
 
 
 const TopSideButtons = ({ removeFilter, applyFilter, applySearch }) => {
@@ -42,7 +43,9 @@ const TopSideButtons = ({ removeFilter, applyFilter, applySearch }) => {
 
     return (
         <div className="inline-block float-right">
-            <SearchBar searchText={searchText} styleClass="mr-4" setSearchText={setSearchText} />
+            {/* <SearchBar searchText={searchText} styleClass="mr-4" setSearchText={setSearchText} /> */}
+            <input type="text" className="input input-bordered w-50 mt-2" placeholder="Search text"
+                onKeyUp={(e) => FilterFunnction(0, e.target)} />
             {filterParam != "" && <button onClick={() => removeAppliedFilter()} className="btn btn-xs mr-2 btn-active btn-ghost normal-case">{filterParam}<XMarkIcon className="w-4 ml-2" /></button>}
             {/* <div className="dropdown dropdown-bottom dropdown-end">
                 <label tabIndex={0} className="btn btn-sm btn-outline"><FunnelIcon className="w-5 mr-2" />Filter</label>
@@ -153,7 +156,7 @@ function Bookings() {
 
                 {/* Team Member list in table format loaded constant */}
                 <div className="overflow-x-auto w-full">
-                    <table className="table w-full">
+                    <table className="table w-full" id="dataTable">
                         <thead>
                             <tr>
                                 <th>User name</th>
