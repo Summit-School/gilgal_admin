@@ -10,8 +10,9 @@ import {
 import TrashIcon from "@heroicons/react/24/outline/TrashIcon";
 import PencilSquareIcon from "@heroicons/react/24/outline/PencilSquareIcon";
 import { showNotification } from "../common/headerSlice";
-import SearchBar from "../../components/Input/SearchBar";
+// import SearchBar from "../../components/Input/SearchBar";
 import { getCategories } from "../../app/reducers/app";
+import { FilterFunnction } from "../../components/TableFilter/FilterFunction";
 
 const TopSideButtons = () => {
   const dispatch = useDispatch();
@@ -28,6 +29,8 @@ const TopSideButtons = () => {
   return (
     <div className="">
       {/* <SearchBar /> */}
+      <input type="text" className="input input-bordered w-50 mt-2" placeholder="Search text"
+        onKeyUp={(e) => FilterFunnction(0, e.target)} />
 
       <button
         className="btn mx-3 px-6 btn-sm normal-case btn-primary"
@@ -103,7 +106,7 @@ function CategoryPage() {
       >
         {/* room List in table format loaded from slice after api call */}
         <div className="overflow-x-auto w-full">
-          <table className="table w-full">
+          <table className="table w-full" id="dataTable">
             <thead>
               <tr>
                 <th>Title</th>
